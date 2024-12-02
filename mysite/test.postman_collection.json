@@ -1,0 +1,241 @@
+{
+	"info": {
+		"_postman_id": "3c3eb401-c47a-4fff-80e6-a9609bf53c38",
+		"name": "test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40120246"
+	},
+	"item": [
+		{
+			"name": "http://127.0.0.1:8000/api/send-auth-code/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"phone_number\": \"1234567890\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/send-auth-code/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"send-auth-code",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "[2] Create A New Account (FromAccount)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"",
+							"pm.test(\"Should have a valid JSON format response body\", function () {",
+							"    pm.expect(response).to.not.be.undefined;",
+							"});",
+							"",
+							"pm.test(\"Should have the required 'account' object in the response\", function () {",
+							"    pm.expect(response).to.be.an('object');",
+							"    pm.expect(response.account).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Should have the `id` property in the account object and is a non-negative integer\", function () {",
+							"  pm.expect(response.account.id).to.be.a('number').and.to.be.at.least(0);",
+							"});",
+							"",
+							"// Only set the variable if the response is successful ",
+							"if (pm.response.code === 200) {",
+							"    pm.collectionVariables.set(\"e2e_user_name_from\", JSON.parse(pm.request.body.raw).owner);",
+							"    pm.collectionVariables.set(\"e2e_user_account_id_from\", response.account.id)",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Generate the payload data for the create user request",
+							"",
+							"let fullName = `${pm.variables.replaceIn(\"{{$randomFirstName}}\")} ${pm.variables.replaceIn(\"{{$randomLastName}}\")}`;",
+							"",
+							"let payload = {",
+							"    \"owner\": `${fullName} - FromAccount`,",
+							"    \"balance\": 50,",
+							"    \"currency\": \"COSMIC_COINS\"",
+							"}",
+							"",
+							"// Store the payload in a runtime-only variable ",
+							"pm.variables.set('payload', JSON.stringify(payload));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"phone_number\": \"1234567890\", \"code\": 1234}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/verify-auth-code/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"verify-auth-code",
+						""
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Successful Response",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{{payload}}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/accounts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"accounts"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Mon, 11 Mar 2024 01:07:48 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json; charset=utf-8"
+						},
+						{
+							"key": "Content-Length",
+							"value": "22"
+						},
+						{
+							"key": "Connection",
+							"value": "keep-alive"
+						},
+						{
+							"key": "uWebSockets",
+							"value": "20"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"account\": {\n        \"id\": 151\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/set-invite-code/",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"phone_number\": \"1234567890\", \"invited_by\": \"AB12CD\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/set-invite-code/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"set-invite-code",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/get-user-profile/1234567890/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/get-user-profile/1234567890/",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"get-user-profile",
+						"1234567890",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
